@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阈值设置</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .threshold-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .threshold-group h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .input-group label {
+            min-width: 80px;
+            font-weight: bold;
+        }
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>阈值设置</h1>
+        
+        {% if messages %}
+        <div class="status {% if messages.0.tags %}{{ messages.0.tags }}{% endif %}">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- 温度阈值设置 -->
+        <form method="post" action="{% url 'set_threshold' %}">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="temperature">
+            <div class="threshold-group">
+                <h3>温度阈值</h3>
+                <div class="input-group">
+                    <label for="temp_min">最小值:</label>
+                    <input type="number" id="temp_min" name="min" step="0.1" placeholder="最低温度" required>
+                    <label for="temp_max">最大值:</label>
+                    <input type="number" id="temp_max" name="max" step="0.1" placeholder="最高温度" required>
+                    <button type="submit">确认设置</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- 光照阈值设置 -->
+        <form method="post" action="{% url 'set_threshold' %}">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="light">
+            <div class="threshold-group">
+                <h3>光照阈值</h3>
+                <div class="input-group">
+                    <label for="light_min">最小值:</label>
+                    <input type="number" id="light_min" name="min" placeholder="最低光照" required>
+                    <label for="light_max">最大值:</label>
+                    <input type="number" id="light_max" name="max" placeholder="最高光照" required>
+                    <button type="submit">确认设置</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- 含氧量阈值设置 -->
+        <form method="post" action="{% url 'set_threshold' %}">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="oxygen">
+            <div class="threshold-group">
+                <h3>含氧量阈值</h3>
+                <div class="input-group">
+                    <label for="oxygen_min">最小值:</label>
+                    <input type="number" id="oxygen_min" name="min" step="0.1" placeholder="最低含氧量" required>
+                    <label for="oxygen_max">最大值:</label>
+                    <input type="number" id="oxygen_max" name="max" step="0.1" placeholder="最高含氧量" required>
+                    <button type="submit">确认设置</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- TDS值阈值设置 -->
+        <form method="post" action="{% url 'set_threshold' %}">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="tds">
+            <div class="threshold-group">
+                <h3>TDS值阈值</h3>
+                <div class="input-group">
+                    <label for="tds_min">最小值:</label>
+                    <input type="number" id="tds_min" name="min" placeholder="最低TDS值" required>
+                    <label for="tds_max">最大值:</label>
+                    <input type="number" id="tds_max" name="max" placeholder="最高TDS值" required>
+                    <button type="submit">确认设置</button>
+                </div>
+            </div>
+        </form>
+
+    <a href="{% url 'index' %}" class="back-link">返回首页</a>
+    </div>
+</body>
+</html>

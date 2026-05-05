@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户信息管理</title>
+    <style>
+        .header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-bottom-left-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .username {
+            font-weight: bold;
+            color: #333;
+        }
+        .logout-btn {
+            padding: 5px 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        .back-btn {
+            padding: 5px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+        body {
+            padding-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    {% include "myapp/_header.html" %}
+    <center>
+        <h1>用户信息管理</h1>
+        <a href="{% url 'addusers' %}">添加用户</a>
+        <a href="{% url 'indexusers' %}">浏览用户信息</a>
+        <h2>浏览用户信息</h2>
+        <table width="900",border = "2">
+            <tr>
+                <th>ID号</th>
+                <th>昵称</th>
+                <th>密码</th>
+                <th>操作</th>
+            </tr>
+            {% for us in uslist %}
+                <tr>
+                    <td style="text-align: center;">{{us.id}}</td>
+                    <td style="text-align: center;">{{us.name}}</td>
+                    <td style="text-align: center;">{{us.password}}</td>
+                    <td style="text-align: center;">
+                        <a href="{% url 'editusers' us.id %}">编辑</a>   
+                        <a href="javascript:doDel('{% url 'delusers' us.id %}')">删除</a>
+
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </center>
+    <script>
+    function doDel(url) {
+        // 增加确认提示，防止误操作
+        if (confirm("确定要删除这条记录吗？此操作不可恢复！")) {
+            // 跳转到删除URL（适用于GET请求处理删除）
+            window.location.href = url;
+        }
+    }
+    </script>
+</body>
+</html>

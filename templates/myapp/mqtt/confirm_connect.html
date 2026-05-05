@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>确认MQTT连接</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .confirmation-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .confirmation-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: white;
+            border-radius: 4px;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        .btn-confirm {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-cancel {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 包含公共header -->
+    {% include 'myapp/_header.html' %}
+    
+    <div class="container" style="padding-top: 70px;">
+        <h1>确认MQTT连接</h1>
+        
+        <div class="confirmation-box">
+            <h3>连接参数确认</h3>
+            <div class="confirmation-item">
+                <strong>Broker地址:</strong> {{ host }}
+            </div>
+            <div class="confirmation-item">
+                <strong>端口:</strong> {{ port }}
+            </div>
+            <div class="confirmation-item">
+                <strong>订阅主题:</strong> {{ topics }}
+            </div>
+            <div class="confirmation-item">
+                <strong>当前状态:</strong> {% if connected %}已连接{% else %}未连接{% endif %}
+            </div>
+        </div>
+
+        <div class="button-group">
+            <form method="post" action="{% url 'mqtt_connect' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-confirm">确认连接</button>
+            </form>
+            
+            <form method="get" action="{% url 'mqtt_dashboard' %}" style="display: inline;">
+                <button type="submit" class="btn-cancel">取消</button>
+            </form>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <form method="get" action="{% url 'mqtt_dashboard' %}">
+                <button type="submit" class="btn-back">返回控制面板</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据查看 - MQTT数据记录</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-line {
+            background-color: #7835dc;
+            color: white;
+        }
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 80vh;
+            padding: 20px;
+        }
+        .data-table-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+            border-collapse: collapse;
+        }
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .table tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+        .pagination {
+            display: flex;
+            list-style-type: none;
+            margin-block-start: 0;
+            margin-block-end: 0;
+            padding-inline-start: 0;
+            gap: 2px;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: nowrap;
+            gap: 15px;
+        }
+        .page-jump-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
+            white-space: nowrap;
+        }
+        .page-jump-input {
+            width: 70px;
+            text-align: center;
+            height: 38px;
+        }
+        .page-info {
+            margin: 10px 0;
+            text-align: center;
+            color: #6c757d;
+        }
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pagination {
+            margin-bottom: 0;
+        }
+        @media (max-width: 768px) {
+            .data-table-container {
+                padding: 10px;
+            }
+            .header-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pagination-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .page-jump-form {
+                margin-left: 0;
+                margin-top: 0;
+            }
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        @media (max-width: 576px) {
+            .pagination-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            .page-jump-form {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include "myapp/_header.html" %}
+
+    <div class="center-container">
+        <div class="data-table-container">
+            <div class="header-actions">
+                <h3>接收到的消息</h3>
+                <div>
+                    <form method="post" action="{% url 'line_chart_view' %}" style="display: inline; margin-left: 10px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-line">数据分析</button>
+                    </form>
+                    <form method="post" action="{% url 'mqtt_get_messages' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">刷新</button>
+                    </form>
+                    <form method="post" action="{% url 'mqtt_clear' %}" style="display: inline; margin-left: 10px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('确定要清空所有消息吗？');">清空消息</button>
+                    </form>    
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>主题</th>
+                            <th>温度(℃)</th>
+                            <th>光照强度</th>
+                            <th>含氧量</th>
+                            <th>TDS值</th>
+                            <th>QoS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in messages %}
+                        <tr>
+                            <td>{{ message.timestamp|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ message.topic }}</td>
+                            <td>
+                                {% if message.temperature is not None %}
+                                    {{ message.temperature|floatformat:1 }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if message.light is not None %}
+                                    {{ message.light }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if message.oxygen is not None %}
+                                    {{ message.oxygen|floatformat:2 }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if message.tds is not None %}
+                                    {{ message.tds }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ message.qos }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" style="text-align: center;">暂无消息</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分页信息 -->
+            <div class="page-info">
+                第 {{ page_obj.number }} 页，共 {{ page_obj.paginator.num_pages }} 页，
+                显示 {{ page_obj.start_index }} - {{ page_obj.end_index }} 条，总共 {{ page_obj.paginator.count }} 条记录
+            </div>
+            
+            <!-- 分页控件 -->
+            <div class="pagination-container">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                
+                <!-- 跳转到第N页 -->
+                <form class="page-jump-form" method="get" action="">
+                    <span>跳转到第</span>
+                    <input type="number" name="page" class="form-control page-jump-input" 
+                           min="1" max="{{ page_obj.paginator.num_pages }}" 
+                           value="{{ page_obj.number }}" required>
+                    <span>页</span>
+                    <button type="submit" class="btn btn-primary">跳转</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>

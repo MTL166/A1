@@ -1,0 +1,62 @@
+<!-- 公共头部模板 - 用户信息和登出按钮 -->
+<div class="header">
+    <div class="user-info">
+        <a href="{% url 'index' %}" class="back-btn">返回首页</a>
+        {% if username %}
+            <span class="username">欢迎, {{ username }}</span>
+            <a href="{% url 'logout' %}" class="logout-btn">登出</a>
+        {% else %}
+            <span class="username">未登录</span>
+            <a href="{% url 'login' %}" class="logout-btn">登录</a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .header {
+        position: fixed;
+        top: 0;
+        right: 0;
+        padding: 10px 20px;
+        background-color: #f8f9fa;
+        border-bottom-left-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .username {
+        font-weight: bold;
+        color: #333;
+    }
+    .logout-btn {
+        padding: 5px 15px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    .logout-btn:hover {
+        background-color: #c82333;
+    }
+    .back-btn {
+        padding: 5px 15px;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+    .back-btn:hover {
+        background-color: #5a6268;
+    }
+</style>

@@ -1,0 +1,17 @@
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 数据库
+db.sqlite3
+
+# VS Code 配置
+.vscode/
+
+# A1 子仓库（独立仓库，不纳入此项目）
+A1/
+
+# 垃圾文件
+*.log
+*.tmp
